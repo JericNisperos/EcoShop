@@ -7,6 +7,7 @@ import com.willfp.eco.core.gui.onShiftLeftClick
 import com.willfp.eco.core.gui.onShiftRightClick
 import com.willfp.eco.core.gui.slot
 import com.willfp.eco.core.gui.slot.CustomSlot
+import com.willfp.eco.core.items.Items
 import com.willfp.eco.core.items.builder.modify
 import com.willfp.eco.util.formatEco
 import com.willfp.eco.util.toNiceString
@@ -140,7 +141,21 @@ class ShopItemSlot(
     }
 
     private fun extractItemStack(item: ShopItem): (Player, Menu) -> ItemStack {
-        return { player: Player, _: Menu ->
+        return lambda@{ player: Player, _: Menu ->
+            if (plugin.configYml.getBool("shop-items.sold-out.enabled")
+                && item.isBuyable
+                && item.getTotalGlobalBuys() >= item.globalLimit
+            ) {
+                return@lambda Items.lookup(plugin.configYml.getString("shop-items.sold-out.item")).item.modify {
+                    setDisplayName(plugin.configYml.getString("shop-items.sold-out.name").formatEco(player))
+                    addLoreLines(
+                        plugin.configYml.getStrings("shop-items.sold-out.lore")
+                            .replaceIn("%item%", item.displayName)
+                            .formatEco(player)
+                    )
+                }
+            }
+
             val playerBuysLeft = item.getBuysLeft(player)
             val zeroBuysLeftMessage = plugin.langYml.getStrings("cant-buy-again")
             val fallbackPriceMessage = if (playerBuysLeft == 1) {

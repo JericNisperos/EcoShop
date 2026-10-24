@@ -29,6 +29,14 @@ shop-items:
     # - "&e&oRight Click to sell"
     always: [ ] # Always shown.
 
+  sold-out: # Replace the icon of items that have reached their buy.global-limit, disabled by default.
+    enabled: false
+    item: barrier
+    name: "&c&lSOLD OUT"
+    lore:
+      - "&8%item%"
+      - "&7The server has no more stock."
+
 buy-menu:
   rows: 6 # How many rows for the GUI
 
